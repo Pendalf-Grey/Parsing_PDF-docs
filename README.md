@@ -23,6 +23,13 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+Скопируйте пример переменных окружения:
+
+```bash
+cp .env.example .env
+source .env
+```
+
 ## Запуск парсера PDF
 
 Обычный запуск для PDF-файлов из папки `data/pdfs`:
@@ -177,3 +184,102 @@ python chunk_docling_jsonl.py --no-tables
 - `source_content_types` — типы исходных записей, вошедших в чанк: например `heading`, `text`, `table`.
 
 `text` в чанках уже готов для следующего шага: расчета embeddings и загрузки в PostgreSQL/pgvector или другую векторную базу.
+
+## PostgreSQL и pgvector
+
+Локальную базу с pgvector можно поднять через Docker:
+
+```bash
+docker compose up -d postgres
+```
+
+Стандартный `DATABASE_URL` из `.env.example`:
+
+```bash
+postgresql://parsing_pdf:parsing_pdf@localhost:5432/parsing_pdf
+```
+
+Схема создается из файла:
+
+```bash
+sql/001_document_chunks_pgvector.sql
+```
+
+Она создает таблицу `document_chunks` с `embedding vector(4096)` под `Qwen3-Embedding-8B`, а также индексы:
+
+- обычные B-tree индексы по `doc_id`, `source_file`, `chunk_index`, страницам
+- GIN индексы по `section_path`, `source_content_types`, `raw_metadata`
+- full-text GIN индекс по `text`
+- HNSW индекс по первым 2000 измерениям `embedding` через `subvector(...)`
+
+Почему subvector: `Qwen3-Embedding-8B` возвращает `4096` измерений, а pgvector HNSW для типа `vector` индексирует до `2000` измерений. Поэтому PostgreSQL сначала быстро выбирает кандидатов по `subvector(embedding, 1, 2000)`, а `search_pgvector_mlx.py` затем rerank-ит кандидатов по полному `4096`-мерному embedding.
+
+## Загрузка чанков в PostgreSQL
+
+После создания `out/chunked_english_text_tables.jsonl` загрузите чанки:
+
+```bash
+python ingest_chunks_to_postgres.py \
+  --input out/chunked_english_text_tables.jsonl
+```
+
+Скрипт:
+
+- применяет SQL-схему
+- делает upsert по `chunk_id`
+- сохраняет все метаданные чанка
+- оставляет `embedding = NULL`, если вектор еще не посчитан
+
+## Скачивание Qwen3 Embedding для Mac
+
+Модель не коммитится в git и хранится локально в `models/`.
+
+```bash
+hf download mlx-community/Qwen3-Embedding-8B-4bit-DWQ \
+  --local-dir models/Qwen3-Embedding-8B-4bit-DWQ
+```
+
+Для Apple Silicon используется MLX-модель:
+
+```bash
+QWEN3_EMBEDDING_MODEL=models/Qwen3-Embedding-8B-4bit-DWQ
+```
+
+## Расчет embeddings и запись в pgvector
+
+После загрузки чанков в PostgreSQL запустите:
+
+```bash
+python embed_chunks_pgvector_mlx.py \
+  --model models/Qwen3-Embedding-8B-4bit-DWQ \
+  --batch-size 2
+```
+
+Скрипт:
+
+- берет строки из `document_chunks`, где `embedding IS NULL`
+- считает embeddings через `mlx-embeddings`
+- проверяет размерность `4096`
+- L2-нормализует вектор
+- записывает результат в `embedding vector(4096)`
+- сохраняет `embedding_model` и `embedding_created_at`
+
+Если нужно сохранить сырые ненормализованные vectors:
+
+```bash
+python embed_chunks_pgvector_mlx.py --no-normalize
+```
+
+## Проверка semantic search
+
+Когда embeddings записаны, можно проверить поиск:
+
+```bash
+python search_pgvector_mlx.py "how to replace hot-plug power supply" --limit 5
+```
+
+Запрос тоже эмбеддится той же MLX Qwen3-моделью, затем PostgreSQL ищет ближайшие чанки через cosine distance:
+
+```sql
+ORDER BY embedding <=> query_embedding
+```

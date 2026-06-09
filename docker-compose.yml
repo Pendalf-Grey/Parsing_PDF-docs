@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: parsing-pdf-pgvector
+    environment:
+      POSTGRES_DB: parsing_pdf
+      POSTGRES_USER: parsing_pdf
+      POSTGRES_PASSWORD: parsing_pdf
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgvector_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U parsing_pdf -d parsing_pdf"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pgvector_data:
