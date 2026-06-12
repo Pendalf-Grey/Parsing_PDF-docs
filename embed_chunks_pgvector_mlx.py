@@ -10,14 +10,14 @@ from typing import Any
 import psycopg
 
 
-DEFAULT_MODEL = "models/Qwen3-Embedding-8B-4bit-DWQ"
-DEFAULT_DIMENSION = 4096
+DEFAULT_MODEL = "models/Qwen3-Embedding-0.6B"
+DEFAULT_DIMENSION = 1024
 DEFAULT_BATCH_SIZE = 2
 DEFAULT_MAX_LENGTH = 8192
 
 
 def database_url() -> str:
-    """Returns the PostgreSQL connection URL from the environment."""
+    """Возвращает URL подключения к PostgreSQL из окружения."""
     url = os.getenv("DATABASE_URL")
 
     if not url:
@@ -27,12 +27,12 @@ def database_url() -> str:
 
 
 def model_path(default: str) -> str:
-    """Returns the embedding model path from CLI default or environment."""
+    """Возвращает путь к embedding-модели из CLI-значения по умолчанию или окружения."""
     return os.getenv("QWEN3_EMBEDDING_MODEL", default)
 
 
 def fetch_pending_chunks(conn: psycopg.Connection, limit: int) -> list[tuple[str, str]]:
-    """Fetches chunks that do not have embeddings yet."""
+    """Получает чанки, у которых еще нет embeddings."""
     with conn.cursor() as cur:
         cur.execute(
             """
@@ -48,12 +48,12 @@ def fetch_pending_chunks(conn: psycopg.Connection, limit: int) -> list[tuple[str
 
 
 def vector_literal(vector: Sequence[float]) -> str:
-    """Serializes a Python float sequence to pgvector literal format."""
+    """Сериализует Python-последовательность float в формат литерала pgvector."""
     return "[" + ",".join(f"{float(value):.9g}" for value in vector) + "]"
 
 
 def normalize_vector(vector: Sequence[float]) -> list[float]:
-    """Returns an L2-normalized copy of an embedding vector."""
+    """Возвращает L2-нормализованную копию embedding-вектора."""
     norm = math.sqrt(sum(float(value) * float(value) for value in vector))
 
     if norm == 0:
@@ -63,12 +63,12 @@ def normalize_vector(vector: Sequence[float]) -> list[float]:
 
 
 def batched(items: Sequence[tuple[str, str]], batch_size: int) -> list[list[tuple[str, str]]]:
-    """Splits items into fixed-size batches."""
+    """Разбивает элементы на батчи фиксированного размера."""
     return [list(items[i : i + batch_size]) for i in range(0, len(items), batch_size)]
 
 
 class MlxQwen3Embedder:
-    """Thin wrapper around mlx-embeddings for Qwen3 text embeddings."""
+    """Тонкая обертка над mlx-embeddings для текстовых embeddings Qwen3."""
 
     def __init__(self, model_name_or_path: str, max_length: int) -> None:
         from mlx_embeddings.utils import load
@@ -78,7 +78,7 @@ class MlxQwen3Embedder:
         self.model, self.tokenizer = load(model_name_or_path)
 
     def embed(self, texts: list[str]) -> list[list[float]]:
-        """Embeds a batch of texts and returns Python float vectors."""
+        """Считает embeddings для батча текстов и возвращает Python-векторы float."""
         import mlx.core as mx
 
         inputs = self.tokenizer.batch_encode_plus(
@@ -102,7 +102,7 @@ def update_embeddings(
     rows: list[tuple[str, list[float]]],
     model_name_or_path: str,
 ) -> None:
-    """Writes embeddings back to PostgreSQL."""
+    """Записывает embeddings обратно в PostgreSQL."""
     sql = """
         UPDATE document_chunks
         SET
@@ -125,7 +125,7 @@ def update_embeddings(
 
 
 def validate_embedding(vector: Sequence[float], expected_dimension: int) -> None:
-    """Ensures an embedding has the expected pgvector dimension."""
+    """Проверяет, что embedding имеет ожидаемую размерность pgvector."""
     if len(vector) != expected_dimension:
         raise ValueError(f"Expected embedding dimension {expected_dimension}, got {len(vector)}")
 
@@ -138,7 +138,7 @@ def embed_pending_chunks(
     expected_dimension: int,
     normalize: bool,
 ) -> int:
-    """Embeds pending chunks and returns the number of updated rows."""
+    """Считает embeddings для ожидающих чанков и возвращает число обновленных строк."""
     pending = fetch_pending_chunks(conn, limit=limit)
     updated = 0
 
@@ -160,14 +160,14 @@ def embed_pending_chunks(
 
 
 def main() -> None:
-    """Embeds PostgreSQL chunks with MLX Qwen3 and stores vectors in pgvector."""
+    """Считает embeddings для PostgreSQL-чанков через MLX Qwen3 и сохраняет их в pgvector."""
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model", default=DEFAULT_MODEL, help="Local path or Hugging Face model id")
+    parser.add_argument("--model", default=DEFAULT_MODEL, help="Локальный путь или id модели Hugging Face")
     parser.add_argument("--batch-size", type=int, default=DEFAULT_BATCH_SIZE)
-    parser.add_argument("--limit", type=int, default=1000000, help="Maximum pending chunks to embed")
+    parser.add_argument("--limit", type=int, default=1000000, help="Максимум ожидающих чанков для embedding")
     parser.add_argument("--max-length", type=int, default=DEFAULT_MAX_LENGTH)
     parser.add_argument("--dimension", type=int, default=DEFAULT_DIMENSION)
-    parser.add_argument("--no-normalize", action="store_true", help="Store raw model vectors")
+    parser.add_argument("--no-normalize", action="store_true", help="Сохранять сырые векторы модели")
     args = parser.parse_args()
 
     selected_model = model_path(args.model)

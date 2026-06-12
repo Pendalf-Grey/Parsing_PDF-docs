@@ -15,12 +15,12 @@ DEFAULT_OUTPUT = Path("out/chunked_english_text_tables.jsonl")
 
 
 def normalize_space(text: str) -> str:
-    """Normalizes whitespace while keeping the text content unchanged."""
+    """Нормализует пробелы, не меняя смысловое содержимое текста."""
     return re.sub(r"\s+", " ", text).strip()
 
 
 def read_jsonl(path: Path) -> list[dict[str, Any]]:
-    """Reads a JSONL file and returns each line as a dictionary."""
+    """Читает JSONL-файл и возвращает каждую строку как словарь."""
     records: list[dict[str, Any]] = []
 
     with path.open("rb") as f:
@@ -33,7 +33,7 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
 
 
 def write_jsonl(path: Path, records: Iterable[dict[str, Any]]) -> None:
-    """Writes dictionaries to a JSONL file, creating the parent directory if needed."""
+    """Записывает словари в JSONL-файл и при необходимости создает родительскую папку."""
     path.parent.mkdir(parents=True, exist_ok=True)
 
     with path.open("wb") as f:
@@ -42,7 +42,7 @@ def write_jsonl(path: Path, records: Iterable[dict[str, Any]]) -> None:
 
 
 def record_text(record: dict[str, Any], include_tables: bool) -> str:
-    """Returns the text that should participate in chunking for one parsed Docling record."""
+    """Возвращает текст одной записи Docling, который должен участвовать в чанковании."""
     content_type = record.get("content_type")
 
     if content_type == "table" and include_tables:
@@ -55,7 +55,7 @@ def record_text(record: dict[str, Any], include_tables: bool) -> str:
 
 
 def record_sort_key(record: dict[str, Any]) -> tuple[str, str, int, int]:
-    """Builds a stable ordering key for records from the same input JSONL."""
+    """Создает стабильный ключ сортировки для записей из одного входного JSONL."""
     return (
         str(record.get("doc_id") or ""),
         str(record.get("source_file") or ""),
@@ -65,7 +65,7 @@ def record_sort_key(record: dict[str, Any]) -> tuple[str, str, int, int]:
 
 
 def section_key(record: dict[str, Any]) -> tuple[str, str, tuple[str, ...]]:
-    """Groups records by document, source file, and section path."""
+    """Группирует записи по документу, исходному файлу и пути секции."""
     return (
         str(record.get("doc_id") or ""),
         str(record.get("source_file") or ""),
@@ -74,12 +74,12 @@ def section_key(record: dict[str, Any]) -> tuple[str, str, tuple[str, ...]]:
 
 
 def words_with_offsets(text: str) -> list[tuple[str, int, int]]:
-    """Splits text into words and keeps character offsets for each word."""
+    """Разбивает текст на слова и сохраняет символьные смещения каждого слова."""
     return [(match.group(0), match.start(), match.end()) for match in re.finditer(r"\S+", text)]
 
 
 def split_text_with_overlap(text: str, chunk_words: int, overlap_words: int) -> list[str]:
-    """Splits text into word-based chunks with a word overlap between adjacent chunks."""
+    """Разбивает текст на чанки по словам с overlap между соседними чанками."""
     words = words_with_offsets(text)
 
     if not words:
@@ -107,13 +107,13 @@ def split_text_with_overlap(text: str, chunk_words: int, overlap_words: int) -> 
 
 
 def chunk_id(doc_id: str, source_file: str, chunk_index: int, text: str) -> str:
-    """Creates a stable chunk id from source metadata, chunk order, and chunk text."""
+    """Создает стабильный chunk_id из метаданных, порядка чанка и текста."""
     payload = f"{doc_id}\n{source_file}\n{chunk_index}\n{text}".encode("utf-8")
     return hashlib.sha256(payload).hexdigest()
 
 
 def page_range(records: list[dict[str, Any]]) -> tuple[int | None, int | None]:
-    """Returns the minimum start page and maximum end page for source records."""
+    """Возвращает минимальную начальную и максимальную конечную страницу исходных записей."""
     starts = [r.get("page_start") for r in records if r.get("page_start") is not None]
     ends = [r.get("page_end") for r in records if r.get("page_end") is not None]
 
@@ -129,7 +129,7 @@ def build_chunk_record(
     chunk_index: int,
     section_path: list[str],
 ) -> dict[str, Any]:
-    """Builds one JSONL-ready chunk record and preserves source metadata."""
+    """Создает одну JSONL-ready запись чанка и сохраняет исходные метаданные."""
     first = source_records[0]
     page_start, page_end = page_range(source_records)
     doc_id = str(first.get("doc_id") or "")
@@ -157,7 +157,7 @@ def flush_group(
     chunk_index_start: int,
     include_tables: bool,
 ) -> list[dict[str, Any]]:
-    """Turns one section group of parsed Docling records into overlapped chunks."""
+    """Преобразует группу записей одной секции Docling в чанки с overlap."""
     if not group_records:
         return []
 
@@ -185,7 +185,7 @@ def flush_group(
 
 
 def validate_chunk_settings(chunk_words: int, overlap_words: int) -> None:
-    """Validates chunk size and overlap parameters before processing."""
+    """Проверяет размер чанка и overlap перед обработкой."""
     if chunk_words <= 0:
         raise ValueError("--chunk-words must be greater than 0")
 
@@ -202,7 +202,7 @@ def chunk_records(
     overlap_words: int,
     include_tables: bool,
 ) -> list[dict[str, Any]]:
-    """Chunks parsed Docling records by document section with configurable overlap."""
+    """Чанкует записи Docling по секциям документа с настраиваемым overlap."""
     validate_chunk_settings(chunk_words, overlap_words)
 
     prepared_records: list[dict[str, Any]] = []
@@ -235,16 +235,16 @@ def chunk_records(
 
 
 def main() -> None:
-    """Runs the Docling JSONL chunking CLI."""
+    """Запускает CLI для чанкования JSONL, полученного из Docling."""
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input", default=str(DEFAULT_INPUT), help="Input JSONL from parce_docling_english.py")
-    parser.add_argument("--out", default=str(DEFAULT_OUTPUT), help="Output chunked JSONL path")
-    parser.add_argument("--chunk-words", type=int, default=180, help="Maximum words per chunk")
-    parser.add_argument("--overlap-words", type=int, default=40, help="Words repeated from the previous chunk")
+    parser.add_argument("--input", default=str(DEFAULT_INPUT), help="Входной JSONL из parce_docling_english.py")
+    parser.add_argument("--out", default=str(DEFAULT_OUTPUT), help="Путь для выходного JSONL с чанками")
+    parser.add_argument("--chunk-words", type=int, default=180, help="Максимальное количество слов в чанке")
+    parser.add_argument("--overlap-words", type=int, default=40, help="Слова, повторяемые из предыдущего чанка")
     parser.add_argument(
         "--no-tables",
         action="store_true",
-        help="Exclude table records from chunking",
+        help="Исключить табличные записи из чанкования",
     )
     args = parser.parse_args()
 

@@ -11,6 +11,43 @@ import orjson
 import pandas as pd
 from lingua import Language, LanguageDetectorBuilder
 
+
+def patch_pydantic_string_constraints() -> None:
+    """Чинит конструктор StringConstraints в связке Python 3.10 + pydantic/Docling."""
+    try:
+        from pydantic import StringConstraints
+    except Exception:
+        return
+
+    try:
+        StringConstraints(strict=True, pattern="x")
+        return
+    except TypeError:
+        pass
+
+    def init(
+        self,
+        strip_whitespace=None,
+        to_upper=None,
+        to_lower=None,
+        strict=None,
+        min_length=None,
+        max_length=None,
+        pattern=None,
+    ):
+        object.__setattr__(self, "strip_whitespace", strip_whitespace)
+        object.__setattr__(self, "to_upper", to_upper)
+        object.__setattr__(self, "to_lower", to_lower)
+        object.__setattr__(self, "strict", strict)
+        object.__setattr__(self, "min_length", min_length)
+        object.__setattr__(self, "max_length", max_length)
+        object.__setattr__(self, "pattern", pattern)
+
+    StringConstraints.__init__ = init
+
+
+patch_pydantic_string_constraints()
+
 from docling.document_converter import DocumentConverter, PdfFormatOption
 from docling.datamodel.base_models import InputFormat
 from docling.datamodel.pipeline_options import PdfPipelineOptions
@@ -71,7 +108,7 @@ def sha256_file(path: Path) -> str:
 
 def normalize_text(text: str) -> str:
     """Очищает текст от служебных символов, нормализует пробелы и приводит к нижнему регистру."""
-    text = text.replace("\u00ad", "")  # soft hyphen
+    text = text.replace("\u00ad", "")  # Мягкий перенос.
     text = text.replace("￾", "-")
     text = re.sub(r"[ \t]+", " ", text)
     text = re.sub(r"\n{3,}", "\n\n", text)
@@ -87,15 +124,15 @@ def check_device_available(device: str) -> None:
         import torch
     except Exception:
         warnings.warn(
-            "requested --device mps, but torch is not importable; docling may fall back to cpu",
+            "запрошен --device mps, но torch не импортируется; docling может откатиться на cpu",
             stacklevel=2,
         )
         return
 
     if not torch.backends.mps.is_available():
         warnings.warn(
-            "requested --device mps, but pytorch does not report apple gpu/mps as available; "
-            "docling may fall back to cpu",
+            "запрошен --device mps, но pytorch не сообщает о доступности apple gpu/mps; "
+            "docling может откатиться на cpu",
             stacklevel=2,
         )
 
@@ -402,13 +439,13 @@ def write_debug_markdown(path: Path, records: list[dict[str, Any]]) -> None:
 def main() -> None:
     """Разбирает CLI-аргументы, запускает парсинг PDF и сохраняет JSONL/debug Markdown."""
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input", required=True, help="PDF file or directory with PDFs")
-    parser.add_argument("--out", required=True, help="Output directory")
-    parser.add_argument("--ocr", action="store_true", help="Enable OCR for scanned PDFs")
+    parser.add_argument("--input", required=True, help="PDF-файл или папка с PDF")
+    parser.add_argument("--out", required=True, help="Выходная папка")
+    parser.add_argument("--ocr", action="store_true", help="Включить OCR для сканированных PDF")
     parser.add_argument(
         "--device",
         default="auto",
-        help="Docling accelerator device: auto, cpu, mps, cuda, cuda:N, or xpu",
+        help="Устройство-ускоритель Docling: auto, cpu, mps, cuda, cuda:N или xpu",
     )
     args = parser.parse_args()
 

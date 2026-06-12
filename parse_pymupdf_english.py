@@ -50,7 +50,7 @@ NON_ENGLISH_STRONG_MARKERS = {
 
 
 def sha256_file(path: Path) -> str:
-    """Returns SHA-256 for the source PDF."""
+    """Считает SHA-256 для исходного PDF."""
     h = hashlib.sha256()
     with path.open("rb") as f:
         for block in iter(lambda: f.read(1024 * 1024), b""):
@@ -59,7 +59,7 @@ def sha256_file(path: Path) -> str:
 
 
 def normalize_text(text: str) -> str:
-    """Normalizes whitespace and lowercases text."""
+    """Нормализует пробелы и приводит текст к нижнему регистру."""
     text = text.replace("\u00ad", "")
     text = text.replace("￾", "-")
     text = re.sub(r"[ \t]+", " ", text)
@@ -68,12 +68,12 @@ def normalize_text(text: str) -> str:
 
 
 def has_cjk(text: str) -> bool:
-    """Returns true when text contains CJK characters."""
+    """Возвращает true, если текст содержит китайские, японские или корейские символы."""
     return bool(re.search(r"[\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af]", text))
 
 
 def latin_letter_ratio(text: str) -> float:
-    """Returns the ASCII-latin ratio among latin letters."""
+    """Возвращает долю ASCII-латиницы среди всех латинских букв."""
     letters = re.findall(r"[A-Za-zÀ-ÿ]", text)
     if not letters:
         return 0.0
@@ -82,19 +82,19 @@ def latin_letter_ratio(text: str) -> float:
 
 
 def looks_like_technical_english(text: str) -> bool:
-    """Detects short technical English lines with domain hints."""
+    """Определяет короткие технические английские строки по доменным подсказкам."""
     words = set(re.findall(r"[A-Za-z]{3,}", text.lower()))
     return len(words & TECHNICAL_ENGLISH_HINTS) >= 2
 
 
 def has_non_english_markers(text: str) -> bool:
-    """Detects strong non-English warranty/service markers."""
+    """Ищет сильные маркеры неанглийских warranty/service-блоков."""
     low = text.lower()
     return any(marker in low for marker in NON_ENGLISH_STRONG_MARKERS)
 
 
 def is_english(text: str, min_confidence: float = 0.60) -> bool:
-    """Classifies a text block as English enough for this technical corpus."""
+    """Определяет, достаточно ли текстовый блок похож на английский для этого технического корпуса."""
     text = normalize_text(text)
 
     if len(text) < 8:
@@ -118,7 +118,7 @@ def is_english(text: str, min_confidence: float = 0.60) -> bool:
 
 
 def block_text(block: dict[str, Any]) -> str:
-    """Extracts normalized text from a PyMuPDF text block."""
+    """Извлекает нормализованный текст из текстового блока PyMuPDF."""
     lines: list[str] = []
 
     for line in block.get("lines", []):
@@ -133,7 +133,7 @@ def block_text(block: dict[str, Any]) -> str:
 
 
 def block_max_font_size(block: dict[str, Any]) -> float:
-    """Returns the maximum font size found in a PyMuPDF text block."""
+    """Возвращает максимальный размер шрифта в текстовом блоке PyMuPDF."""
     sizes: list[float] = []
 
     for line in block.get("lines", []):
@@ -146,7 +146,7 @@ def block_max_font_size(block: dict[str, Any]) -> float:
 
 
 def page_body_font_size(blocks: list[dict[str, Any]]) -> float:
-    """Estimates page body font size from text spans."""
+    """Оценивает основной размер шрифта страницы по текстовым spans."""
     sizes: list[float] = []
 
     for block in blocks:
@@ -168,7 +168,7 @@ def page_body_font_size(blocks: list[dict[str, Any]]) -> float:
 
 
 def looks_like_heading(text: str, font_size: float, body_size: float) -> bool:
-    """Heuristically classifies a text block as a heading."""
+    """Эвристически определяет, является ли текстовый блок заголовком."""
     words = text.split()
 
     if len(words) > 12:
@@ -184,14 +184,14 @@ def looks_like_heading(text: str, font_size: float, body_size: float) -> bool:
 
 
 def extract_blocks(page: fitz.Page) -> list[dict[str, Any]]:
-    """Returns text blocks sorted top-to-bottom and left-to-right."""
+    """Возвращает текстовые блоки, отсортированные сверху вниз и слева направо."""
     data = page.get_text("dict")
     blocks = [block for block in data.get("blocks", []) if block.get("type") == 0]
     return sorted(blocks, key=lambda b: (b.get("bbox", [0, 0, 0, 0])[1], b.get("bbox", [0, 0, 0, 0])[0]))
 
 
 def parse_pdf(pdf_path: Path) -> list[dict[str, Any]]:
-    """Parses a PDF with PyMuPDF and returns JSONL-ready English text records."""
+    """Парсит PDF через PyMuPDF и возвращает JSONL-ready записи английского текста."""
     doc_id = sha256_file(pdf_path)
     records: list[dict[str, Any]] = []
     current_section: str | None = None
@@ -229,14 +229,14 @@ def parse_pdf(pdf_path: Path) -> list[dict[str, Any]]:
 
 
 def write_jsonl(path: Path, records: list[dict[str, Any]]) -> None:
-    """Writes records to JSONL."""
+    """Записывает записи в JSONL."""
     with path.open("wb") as f:
         for record in records:
             f.write(orjson.dumps(record, option=orjson.OPT_APPEND_NEWLINE))
 
 
 def write_debug_markdown(path: Path, records: list[dict[str, Any]]) -> None:
-    """Writes a human-readable debug Markdown file."""
+    """Записывает человекочитаемый debug Markdown-файл."""
     chunks: list[str] = []
 
     for i, record in enumerate(records, start=1):
@@ -257,10 +257,10 @@ def write_debug_markdown(path: Path, records: list[dict[str, Any]]) -> None:
 
 
 def main() -> None:
-    """Runs the PyMuPDF parser CLI."""
+    """Запускает CLI парсера PyMuPDF."""
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input", required=True, help="PDF file or directory with PDFs")
-    parser.add_argument("--out", required=True, help="Output directory")
+    parser.add_argument("--input", required=True, help="PDF-файл или папка с PDF")
+    parser.add_argument("--out", required=True, help="Выходная папка")
     args = parser.parse_args()
 
     input_path = Path(args.input)

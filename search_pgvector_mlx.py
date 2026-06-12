@@ -12,7 +12,7 @@ from embed_chunks_pgvector_mlx import DEFAULT_DIMENSION, DEFAULT_MAX_LENGTH, DEF
 
 
 def database_url() -> str:
-    """Returns the PostgreSQL connection URL from the environment."""
+    """Возвращает URL подключения к PostgreSQL из окружения."""
     url = os.getenv("DATABASE_URL")
 
     if not url:
@@ -22,12 +22,12 @@ def database_url() -> str:
 
 
 def vector_literal(vector: Sequence[float]) -> str:
-    """Serializes a Python float sequence to pgvector literal format."""
+    """Сериализует Python-последовательность float в формат литерала pgvector."""
     return "[" + ",".join(f"{float(value):.9g}" for value in vector) + "]"
 
 
 def normalize_vector(vector: Sequence[float]) -> list[float]:
-    """Returns an L2-normalized copy of an embedding vector."""
+    """Возвращает L2-нормализованную копию embedding-вектора."""
     norm = math.sqrt(sum(float(value) * float(value) for value in vector))
 
     if norm == 0:
@@ -42,7 +42,7 @@ def search(
     limit: int,
     candidate_limit: int,
 ) -> list[tuple]:
-    """Runs ANN subvector search and reranks candidates by the full vector."""
+    """Запускает ANN-поиск по полному 1024-мерному embedding-вектору."""
     query_vector = vector_literal(query_embedding)
 
     with conn.cursor() as cur:
@@ -59,8 +59,7 @@ def search(
                     embedding
                 FROM document_chunks
                 WHERE embedding IS NOT NULL
-                ORDER BY subvector(embedding, 1, 2000)::vector(2000)
-                    <=> subvector(%s::vector, 1, 2000)::vector(2000)
+                ORDER BY embedding <=> %s::vector
                 LIMIT %s
             )
             SELECT
@@ -81,15 +80,15 @@ def search(
 
 
 def main() -> None:
-    """Embeds a query with MLX Qwen3 and searches nearest chunks in pgvector."""
+    """Считает embedding запроса через MLX Qwen3 и ищет ближайшие чанки в pgvector."""
     parser = argparse.ArgumentParser()
-    parser.add_argument("query", help="Search query text")
+    parser.add_argument("query", help="Текст поискового запроса")
     parser.add_argument("--model", default=os.getenv("QWEN3_EMBEDDING_MODEL", DEFAULT_MODEL))
     parser.add_argument("--max-length", type=int, default=DEFAULT_MAX_LENGTH)
-    parser.add_argument("--dimension", type=int, default=DEFAULT_DIMENSION)
+    parser.add_argument("--dimension", type=int, default=1024)
     parser.add_argument("--limit", type=int, default=5)
     parser.add_argument("--candidate-limit", type=int, default=50)
-    parser.add_argument("--no-normalize", action="store_true", help="Use raw query vector")
+    parser.add_argument("--no-normalize", action="store_true", help="Использовать сырой вектор запроса")
     args = parser.parse_args()
 
     selected_model = args.model

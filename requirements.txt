@@ -1,4 +1,6 @@
-docling>=2.70.0
+docling==2.70.0
+docling-core==2.50.1
+pydantic==2.9.2
 pymupdf>=1.26.0
 pandas>=2.2.0
 lingua-language-detector>=2.0.2

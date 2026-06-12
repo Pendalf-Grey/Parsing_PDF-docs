@@ -15,7 +15,7 @@ DEFAULT_SCHEMA = Path("sql/001_document_chunks_pgvector.sql")
 
 
 def database_url() -> str:
-    """Returns the PostgreSQL connection URL from the environment."""
+    """Возвращает URL подключения к PostgreSQL из окружения."""
     url = os.getenv("DATABASE_URL")
 
     if not url:
@@ -25,7 +25,7 @@ def database_url() -> str:
 
 
 def read_jsonl(path: Path) -> list[dict[str, Any]]:
-    """Reads chunk records from JSONL."""
+    """Читает записи чанков из JSONL."""
     records: list[dict[str, Any]] = []
 
     with path.open("rb") as f:
@@ -38,7 +38,7 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
 
 
 def apply_schema(conn: psycopg.Connection, schema_path: Path) -> None:
-    """Applies the pgvector schema and indexes."""
+    """Применяет схему pgvector и индексы."""
     sql = schema_path.read_text(encoding="utf-8")
 
     with conn.cursor() as cur:
@@ -48,7 +48,7 @@ def apply_schema(conn: psycopg.Connection, schema_path: Path) -> None:
 
 
 def chunk_params(record: dict[str, Any]) -> tuple[Any, ...]:
-    """Converts one chunk JSON record into SQL parameters."""
+    """Преобразует одну JSON-запись чанка в параметры SQL."""
     return (
         record["chunk_id"],
         record["doc_id"],
@@ -66,7 +66,7 @@ def chunk_params(record: dict[str, Any]) -> tuple[Any, ...]:
 
 
 def upsert_chunks(conn: psycopg.Connection, records: list[dict[str, Any]]) -> None:
-    """Inserts or updates chunk rows while preserving existing embeddings."""
+    """Вставляет или обновляет строки чанков, сохраняя уже рассчитанные embeddings."""
     sql = """
         INSERT INTO document_chunks (
             chunk_id,
@@ -113,7 +113,7 @@ def upsert_chunks(conn: psycopg.Connection, records: list[dict[str, Any]]) -> No
 
 
 def count_chunks(conn: psycopg.Connection) -> tuple[int, int]:
-    """Returns total chunks and chunks that already have embeddings."""
+    """Возвращает общее число чанков и число чанков с embeddings."""
     with conn.cursor() as cur:
         cur.execute(
             """
@@ -129,11 +129,11 @@ def count_chunks(conn: psycopg.Connection) -> tuple[int, int]:
 
 
 def main() -> None:
-    """Loads chunked JSONL into PostgreSQL/pgvector."""
+    """Загружает JSONL с чанками в PostgreSQL/pgvector."""
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input", default=str(DEFAULT_INPUT), help="Chunked JSONL file")
-    parser.add_argument("--schema", default=str(DEFAULT_SCHEMA), help="SQL schema path")
-    parser.add_argument("--skip-schema", action="store_true", help="Do not apply schema before ingest")
+    parser.add_argument("--input", default=str(DEFAULT_INPUT), help="JSONL-файл с чанками")
+    parser.add_argument("--schema", default=str(DEFAULT_SCHEMA), help="Путь к SQL-схеме")
+    parser.add_argument("--skip-schema", action="store_true", help="Не применять схему перед загрузкой")
     args = parser.parse_args()
 
     records = read_jsonl(Path(args.input))
