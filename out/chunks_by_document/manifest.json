@@ -1,0 +1,217 @@
+{
+  "source_chunks_file": "out/chunked_english_text_tables.jsonl",
+  "documents_count": 30,
+  "chunks_count": 5312,
+  "documents": [
+    {
+      "source_file": "HP ProLiant DL360 G6 Server Maintenance and Service Guide.pdf",
+      "chunks_file": "HP_ProLiant_DL360_G6_Server_Maintenance_and_Service_Guide.chunks.jsonl",
+      "chunks_count": 92,
+      "first_chunk_index": 2034,
+      "last_chunk_index": 2125
+    },
+    {
+      "source_file": "HPE_a00018775en_us_HPE ProLiant DL560 Gen10 Server Maintenance and Service Guide.pdf",
+      "chunks_file": "HPE_a00018775en_us_HPE_ProLiant_DL560_Gen10_Server_Maintenance_and_Service_Guide.chunks.jsonl",
+      "chunks_count": 281,
+      "first_chunk_index": 727,
+      "last_chunk_index": 1007
+    },
+    {
+      "source_file": "HPE_a00018787en_us_HPE ProLiant DL380 Gen10 Server Maintenance and Service Guide.pdf",
+      "chunks_file": "HPE_a00018787en_us_HPE_ProLiant_DL380_Gen10_Server_Maintenance_and_Service_Guide.chunks.jsonl",
+      "chunks_count": 296,
+      "first_chunk_index": 4287,
+      "last_chunk_index": 4582
+    },
+    {
+      "source_file": "HPE_a00030295en_us_HPE ProLiant DL580 Gen10 Server Maintenance and Service Guide.pdf",
+      "chunks_file": "HPE_a00030295en_us_HPE_ProLiant_DL580_Gen10_Server_Maintenance_and_Service_Guide.chunks.jsonl",
+      "chunks_count": 285,
+      "first_chunk_index": 4583,
+      "last_chunk_index": 4867
+    },
+    {
+      "source_file": "HPE_a00114988en_us_HPE ProLiant DL360 Gen10 Plus Server Maintenance and Service Guide.pdf",
+      "chunks_file": "HPE_a00114988en_us_HPE_ProLiant_DL360_Gen10_Plus_Server_Maintenance_and_Service_Guide.chunks.jsonl",
+      "chunks_count": 183,
+      "first_chunk_index": 0,
+      "last_chunk_index": 182
+    },
+    {
+      "source_file": "HPE_a00114990en_us_HPE ProLiant DL380 Gen10 Plus Server Maintenance and Service Guide.pdf",
+      "chunks_file": "HPE_a00114990en_us_HPE_ProLiant_DL380_Gen10_Plus_Server_Maintenance_and_Service_Guide.chunks.jsonl",
+      "chunks_count": 250,
+      "first_chunk_index": 1784,
+      "last_chunk_index": 2033
+    },
+    {
+      "source_file": "HPE_a00115362en_us_HPE ProLiant DL360 Gen10 Server Maintenance and Service Guide.pdf",
+      "chunks_file": "HPE_a00115362en_us_HPE_ProLiant_DL360_Gen10_Server_Maintenance_and_Service_Guide.chunks.jsonl",
+      "chunks_count": 241,
+      "first_chunk_index": 2656,
+      "last_chunk_index": 2896
+    },
+    {
+      "source_file": "HPE_c00710359_HP ProLiant DL380 Generation 5 Server Maintenance and Service Guide.pdf",
+      "chunks_file": "HPE_c00710359_HP_ProLiant_DL380_Generation_5_Server_Maintenance_and_Service_Guide.chunks.jsonl",
+      "chunks_count": 129,
+      "first_chunk_index": 2418,
+      "last_chunk_index": 2546
+    },
+    {
+      "source_file": "HPE_c00710376_HP ProLiant DL360 Generation 5 Server Maintenance and Service Guide.pdf",
+      "chunks_file": "HPE_c00710376_HP_ProLiant_DL360_Generation_5_Server_Maintenance_and_Service_Guide.chunks.jsonl",
+      "chunks_count": 102,
+      "first_chunk_index": 4185,
+      "last_chunk_index": 4286
+    },
+    {
+      "source_file": "HPE_c01705597_HP ProLiant DL380 G6 Server Maintenance and Service Guide.pdf",
+      "chunks_file": "HPE_c01705597_HP_ProLiant_DL380_G6_Server_Maintenance_and_Service_Guide.chunks.jsonl",
+      "chunks_count": 107,
+      "first_chunk_index": 1008,
+      "last_chunk_index": 1114
+    },
+    {
+      "source_file": "HPE_c02065150_HP ProLiant DL360 G7 Server Maintenance and Service Guide.pdf",
+      "chunks_file": "HPE_c02065150_HP_ProLiant_DL360_G7_Server_Maintenance_and_Service_Guide.chunks.jsonl",
+      "chunks_count": 96,
+      "first_chunk_index": 631,
+      "last_chunk_index": 726
+    },
+    {
+      "source_file": "HPE_c02159538_HP ProLiant DL380 G7 Server Maintenance and Service Guide (594659-006, January 2013).pdf",
+      "chunks_file": "HPE_c02159538_HP_ProLiant_DL380_G7_Server_Maintenance_and_Service_Guide_594659-006_January_2013.chunks.jsonl",
+      "chunks_count": 122,
+      "first_chunk_index": 4868,
+      "last_chunk_index": 4989
+    },
+    {
+      "source_file": "HPE_c02435303_HP ProLiant DL580 G7 Server Maintenance and Service Guide.pdf",
+      "chunks_file": "HPE_c02435303_HP_ProLiant_DL580_G7_Server_Maintenance_and_Service_Guide.chunks.jsonl",
+      "chunks_count": 98,
+      "first_chunk_index": 3515,
+      "last_chunk_index": 3612
+    },
+    {
+      "source_file": "HPE_c03242811_HPE ProLiant DL360p Gen8 Server Maintenance and Service Guide.pdf",
+      "chunks_file": "HPE_c03242811_HPE_ProLiant_DL360p_Gen8_Server_Maintenance_and_Service_Guide.chunks.jsonl",
+      "chunks_count": 118,
+      "first_chunk_index": 3613,
+      "last_chunk_index": 3730
+    },
+    {
+      "source_file": "HPE_c03254241_HP ProLiant DL380p Gen8 Server Maintenance and Service Guide.pdf",
+      "chunks_file": "HPE_c03254241_HP_ProLiant_DL380p_Gen8_Server_Maintenance_and_Service_Guide.chunks.jsonl",
+      "chunks_count": 140,
+      "first_chunk_index": 3039,
+      "last_chunk_index": 3178
+    },
+    {
+      "source_file": "HPE_c03413095_HP ProLiant DL380e Gen8 Server Maintenance and Service Guide.pdf",
+      "chunks_file": "HPE_c03413095_HP_ProLiant_DL380e_Gen8_Server_Maintenance_and_Service_Guide.chunks.jsonl",
+      "chunks_count": 146,
+      "first_chunk_index": 485,
+      "last_chunk_index": 630
+    },
+    {
+      "source_file": "HPE_c03415162_HPE ProLiant DL360e Gen8 Server Maintenance and Service Guide.pdf",
+      "chunks_file": "HPE_c03415162_HPE_ProLiant_DL360e_Gen8_Server_Maintenance_and_Service_Guide.chunks.jsonl",
+      "chunks_count": 124,
+      "first_chunk_index": 4061,
+      "last_chunk_index": 4184
+    },
+    {
+      "source_file": "HPE_c03471114_HP ProLiant DL560 Gen8 Server Maintenance and Service Guide.pdf",
+      "chunks_file": "HPE_c03471114_HP_ProLiant_DL560_Gen8_Server_Maintenance_and_Service_Guide.chunks.jsonl",
+      "chunks_count": 109,
+      "first_chunk_index": 2547,
+      "last_chunk_index": 2655
+    },
+    {
+      "source_file": "HPE_c04126039_HP ProLiant DL580 Gen8 Server Maintenance and Service Guide.pdf",
+      "chunks_file": "HPE_c04126039_HP_ProLiant_DL580_Gen8_Server_Maintenance_and_Service_Guide.chunks.jsonl",
+      "chunks_count": 98,
+      "first_chunk_index": 1423,
+      "last_chunk_index": 1520
+    },
+    {
+      "source_file": "HPE_c04436999_ProLiant DL380 Gen9 Server Maintenance and Service Guide.pdf",
+      "chunks_file": "HPE_c04436999_ProLiant_DL380_Gen9_Server_Maintenance_and_Service_Guide.chunks.jsonl",
+      "chunks_count": 151,
+      "first_chunk_index": 2126,
+      "last_chunk_index": 2276
+    },
+    {
+      "source_file": "HPE_c04441985_ProLiant DL360 Gen9 Server Maintenance and Service Guide.pdf",
+      "chunks_file": "HPE_c04441985_ProLiant_DL360_Gen9_Server_Maintenance_and_Service_Guide.chunks.jsonl",
+      "chunks_count": 141,
+      "first_chunk_index": 2277,
+      "last_chunk_index": 2417
+    },
+    {
+      "source_file": "HPE_c04678095_HPE ProLiant DL580 Gen9 Server Maintenance and Service Guide.pdf",
+      "chunks_file": "HPE_c04678095_HPE_ProLiant_DL580_Gen9_Server_Maintenance_and_Service_Guide.chunks.jsonl",
+      "chunks_count": 119,
+      "first_chunk_index": 3942,
+      "last_chunk_index": 4060
+    },
+    {
+      "source_file": "HPE_c04695742_HPE ProLiant DL560 Gen9 Server Maintenance and Service Guide.pdf",
+      "chunks_file": "HPE_c04695742_HPE_ProLiant_DL560_Gen9_Server_Maintenance_and_Service_Guide.chunks.jsonl",
+      "chunks_count": 142,
+      "first_chunk_index": 2897,
+      "last_chunk_index": 3038
+    },
+    {
+      "source_file": "HPE_c04874064_HP ProLiant DL580 Gen8 Server Maintenance and Service Guide.pdf",
+      "chunks_file": "HPE_c04874064_HP_ProLiant_DL580_Gen8_Server_Maintenance_and_Service_Guide.chunks.jsonl",
+      "chunks_count": 93,
+      "first_chunk_index": 3179,
+      "last_chunk_index": 3271
+    },
+    {
+      "source_file": "HPE_sd00002445en_us_HPE ProLiant DL360 Gen11 Server Maintenance and Service Guide.pdf",
+      "chunks_file": "HPE_sd00002445en_us_HPE_ProLiant_DL360_Gen11_Server_Maintenance_and_Service_Guide.chunks.jsonl",
+      "chunks_count": 211,
+      "first_chunk_index": 3731,
+      "last_chunk_index": 3941
+    },
+    {
+      "source_file": "HPE_sd00002447en_us_HPE ProLiant DL380 Gen11 Server Maintenance and Service Guide.pdf",
+      "chunks_file": "HPE_sd00002447en_us_HPE_ProLiant_DL380_Gen11_Server_Maintenance_and_Service_Guide.chunks.jsonl",
+      "chunks_count": 263,
+      "first_chunk_index": 1521,
+      "last_chunk_index": 1783
+    },
+    {
+      "source_file": "HPE_sd00002568en_us_HPE ProLiant DL560 Gen11 Maintenance and Service Guide.pdf",
+      "chunks_file": "HPE_sd00002568en_us_HPE_ProLiant_DL560_Gen11_Maintenance_and_Service_Guide.chunks.jsonl",
+      "chunks_count": 302,
+      "first_chunk_index": 183,
+      "last_chunk_index": 484
+    },
+    {
+      "source_file": "HPE_sd00005702en_us_HPE ProLiant Compute DL360 Gen12 Maintenance and Service Guide.pdf",
+      "chunks_file": "HPE_sd00005702en_us_HPE_ProLiant_Compute_DL360_Gen12_Maintenance_and_Service_Guide.chunks.jsonl",
+      "chunks_count": 308,
+      "first_chunk_index": 1115,
+      "last_chunk_index": 1422
+    },
+    {
+      "source_file": "HPE_sd00005862en_us_HPE ProLiant Compute DL380 Gen12 Server Maintenance and Service Guide.pdf",
+      "chunks_file": "HPE_sd00005862en_us_HPE_ProLiant_Compute_DL380_Gen12_Server_Maintenance_and_Service_Guide.chunks.jsonl",
+      "chunks_count": 243,
+      "first_chunk_index": 3272,
+      "last_chunk_index": 3514
+    },
+    {
+      "source_file": "HPE_sd00006216en_us_HPE ProLiant Compute DL580 Gen12 Maintenance and Service Guide.pdf",
+      "chunks_file": "HPE_sd00006216en_us_HPE_ProLiant_Compute_DL580_Gen12_Maintenance_and_Service_Guide.chunks.jsonl",
+      "chunks_count": 322,
+      "first_chunk_index": 4990,
+      "last_chunk_index": 5311
+    }
+  ]
+}
